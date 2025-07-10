@@ -1,0 +1,16 @@
+[flake8]
+ignore =
+  E501,
+  E265,
+  F811,
+  PT001,
+  DJ05,
+  D100,
+  D101,
+  D105,
+  D104,
+  D106,
+  W503,
+  PIE803,
+  ANN101,
+max-line-length = 119
