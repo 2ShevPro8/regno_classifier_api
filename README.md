@@ -1,46 +1,46 @@
-#  Сервис классификации регистрационных номеров
+# License Plate Classification Service
 
-## **1. Описание функционала**
+## **1. Functionality Overview**
 
-Сервис реализован на **FastAPI** и выполняет задачу классификации регистрационных номеров автомобилей. Он принимает данные в формате **Base64 JSON**, преобразует их в фичи, передает в модель и возвращает вероятностные предсказания в **JSON в Base64**.
+This service is built with **FastAPI** to perform **classification of vehicle license plates**. It receives data in **Base64 JSON** format, converts it into features, feeds it to the model, and returns probabilistic predictions as **Base64 JSON**.
 
-Чтобы каждый раз не подгружать модель из `pick_regno.py`, загрузка вынесена в `model.py`. В `pick_regno.py` для регулярных выражений добавлен префикс `r` для корректной работы.
+To avoid loading the model each time from `pick_regno.py`, model loading is handled in `model.py`. Additionally, the `r` prefix is used in regular expressions within `pick_regno.py` for correct functionality.
 
-### **Особенности реализации**
+### **Key Implementation Details**
 
- **FastAPI** выбран за:
+**Why FastAPI:**
 
-* Высокую производительность
-* Удобный асинхронный обработчик запросов
-* Простоту интеграции с Pydantic для валидации данных
+* High performance
+* Convenient asynchronous request handling
+* Easy integration with Pydantic for data validation
 
- **pick\_regno.py**:
+**pick\_regno.py:**
 
-* Использует регулярные выражения для классификации шаблонов номеров (гражданские, дипломатические, армейские и т.д.)
-* Вычисляет дополнительные фичи для модели: max/min символа, количество иностранных букв, шаблон номера
+* Uses regular expressions to classify license plate templates (civilian, diplomatic, military, etc.)
+* Calculates additional features for the model: max/min character, number of foreign letters, plate template type
 
- **Тестирование**:
+**Testing:**
 
-* Используется **pytest** с фикстурами для мокания модели
-* Проверяются эндпоинты: `/`, `/health_check`, `/predict_b64`
+* Uses **pytest** with fixtures for model mocking
+* Endpoint tests: `/`, `/health_check`, `/predict_b64`
 
- **Как запускать тесты**:
+**How to run tests:**
 
-* С мок-моделью:
+* With mock model:
 
   ```bash
   pytest -m test_api
   ```
 
-  Добавь флаг `-s` и раскомментируй `print` в `test_api.py`, чтобы видеть предсказания в терминале.
+  Add the `-s` flag and uncomment `print` in `test_api.py` to see predictions in the terminal.
 
-* С реальной моделью:
+* With the real model:
 
   ```bash
   pytest -m test_model
   ```
 
-* Все тесты:
+* Run all tests:
 
   ```bash
   pytest -s
@@ -48,27 +48,27 @@
 
 ---
 
-##  **2. Структура проекта**
+## **2. Project Structure**
 
 ```
 project/
-├── app.py             # Содержит и запускает эндпоинты FastAPI
-├── handler.py         # Класс Handler с методом pipe для обработки входных данных и вызова модели
-├── pick_regno.py      # Преобразование данных, вычисление фичей и классификация шаблонов номеров
-├── model.py           # Загрузка и инициализация ML-модели
-├── test_data.csv      # Тестовые данные
+├── app.py             # FastAPI endpoints
+├── handler.py         # Handler class with pipe method for preprocessing and model inference
+├── pick_regno.py      # Data transformation, feature extraction, and regex-based template classification
+├── model.py           # ML model loading and initialization
+├── test_data.csv      # Test dataset
 ├── tests/
-│   ├── conftest.py    # Общие фикстуры для pytest, включая мок-модель
-│   ├── test_api.py    # Тесты FastAPI эндпоинтов
-│   └── test_handler.py # Тесты класса Handler
-└── requirements.txt   # Зависимости проекта
+│   ├── conftest.py    # Common pytest fixtures, including mock model
+│   ├── test_api.py    # FastAPI endpoint tests
+│   └── test_handler.py # Handler class tests
+└── requirements.txt   # Project dependencies
 ```
 
 ---
 
-##  **3. Как запустить сервис**
+## **3. How to Run the Service**
 
-### **1. Создать окружение и установить зависимости**
+### **1. Create environment and install dependencies**
 
 ```bash
 conda create -n env_name python=3.11
@@ -76,54 +76,50 @@ conda activate env_name
 pip install -r requirements.txt
 ```
 
-### **2. Запустить сервер**
+### **2. Start the server**
 
 ```bash
 uvicorn app:app --reload
 ```
 
-После запуска эндпоинты будут доступны по адресу:
- `http://127.0.0.1:8000`
+After launch, the endpoints will be available at:
+`http://127.0.0.1:8000`
 
 ---
 
-##  **4. Пример Curl-запроса (с Base64)**
+## **4. Example Curl Request (with Base64)**
 
-В проекте прикреплен файл **test\_request\_b64.txt** (содержит запрос в base64).
+The project includes **test\_request\_b64.txt** (contains the request in base64).
 
-Чтобы отправить запрос и получить предсказание:
+To send a request and get predictions:
 
 ```bash
 curl -X POST "http://127.0.0.1:8000/predict_b64" --data-binary @test_request_b64.txt
 ```
 
-### **Как декодировать Base64-ответ в терминале:**
+### **How to decode a Base64 response in terminal:**
 
-Если это **текст** (строка), выполнить:
+If it is **text** (string), run:
 
 ```bash
-echo "строка_b64" | base64 -d
+echo "string_b64" | base64 -d
 ```
 
+---
 
-##  **5. Проверка кода на стилистические ошибки и нарушения различных конвенций с использованием flake8, а также проведен статический анализ типов с помощью mypy**
+## **5. Code Style and Static Analysis**
 
-Код проверен с помощью:
+Code is verified using:
 
-* **flake8** – проверка стиля и PEP8:
+* **flake8** – PEP8 style checks:
 
   ```bash
   flake8 .
   ```
 
-* **mypy** – проверка типов:
+* **mypy** – static type checking:
 
   ```bash
   mypy .
   ```
-
-Обе проверки выполнены **без  ошибок**.
-
-
-
 
